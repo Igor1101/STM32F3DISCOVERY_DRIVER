@@ -24,4 +24,4 @@ make install # for flashing to device
 ## I dont want to compile this, just run
 your steps:
 download [this](./build/ch.bin)
-flash this.
+and flash.
