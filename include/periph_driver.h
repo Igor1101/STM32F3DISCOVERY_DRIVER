@@ -15,9 +15,11 @@ extern mutex_t stds;
 /*funcs */
 void leds(void *args);
 void l3gd20(void *args);
+void lsm(void *args);
 void println(char* str);
 void print(char* str);
 void sys_halted(void);
 
+extern BaseSequentialStream *  stdout_ch;
 
 #endif /* DRINC */

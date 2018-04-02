@@ -117,6 +117,7 @@ CSRC = $(STARTUPSRC) \
 			 src/print.c\
 			 src/leds.c\
 			 src/l3gd20.c\
+			 src/lsm.c\
        main.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global

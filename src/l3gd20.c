@@ -6,8 +6,6 @@
 #include <memstreams.h>
 #include "periph_driver.h"
 
-BaseSequentialStream *  stdout_ch;
-
 typedef union 
 {
   uint16_t CMD;
@@ -54,8 +52,10 @@ bool is_l3gd_running(void)
 
 THD_FUNCTION(l3gd20, arg)
 {
-  println("<l3gd20> thread started...");
-  stdout_ch = (BaseSequentialStream *) &SD1;
+  if(arg==NULL)
+  {
+    println("<l3gd20> thread started...");
+  }
   /* configure SPI1 */
   spiStop(&SPID1);
   static const SPIConfig spi1 = 
@@ -84,6 +84,8 @@ THD_FUNCTION(l3gd20, arg)
   palSetLineMode(LINE_SPI1_MOSI, PAL_MODE_ALTERNATE(5)|PAL_STM32_PUPDR_PULLDOWN);
   palSetLineMode(LINE_SPI1_CS, PAL_MODE_OUTPUT_PUSHPULL);
   palSetLineMode(LINE_SPI1_MISO, PAL_MODE_ALTERNATE(5)|PAL_STM32_PUPDR_PULLDOWN);*/
+
+  /* init interrupts */
   l3gdCMD txreg;
   l3gdCMD rxreg;
   init_l3gdCMD();
@@ -112,7 +114,7 @@ THD_FUNCTION(l3gd20, arg)
     spiUnselect(&SPID1);
     spiSelect(&SPID1);
     conv |= rxreg.CMD<<8;
-    chprintf(stdout_ch, "\n\rL3GD10 X: %X", conv);
+    chprintf(stdout_ch, "\n\rL3GD10 X: %d", (int16_t)conv);
     txreg.bits.AD = 0x2A; /* YL */
     spiExchange(&SPID1, 1, &txreg, &rxreg);
     spiUnselect(&SPID1);
@@ -123,7 +125,7 @@ THD_FUNCTION(l3gd20, arg)
     spiUnselect(&SPID1);
     spiSelect(&SPID1);
     conv |= rxreg.CMD<<8;
-    chprintf(stdout_ch, "\n\rL3GD10 Y: %X", conv);
+    chprintf(stdout_ch, "\n\rL3GD10 Y: %d", (int16_t)conv);
     txreg.bits.AD = 0x2C; /* ZL */
     spiExchange(&SPID1, 1, &txreg, &rxreg);
     spiUnselect(&SPID1);
@@ -133,8 +135,8 @@ THD_FUNCTION(l3gd20, arg)
     spiExchange(&SPID1, 1, &txreg, &rxreg);
     spiUnselect(&SPID1);
     conv |= rxreg.CMD<<8;
-    chprintf(stdout_ch, "\n\rL3GD10 Z: %X", conv);
-    chThdSleep(100000);
+    chprintf(stdout_ch, "\n\rL3GD10 Z: %d", (int16_t)conv);
+    chThdSleep(40000);
     chMtxUnlock(&stds);
     spiUnselect(&SPID1);
   }
